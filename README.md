@@ -1,4 +1,4 @@
-<img src="./folia.png" alt="logo" height="120" align="right">
+<img src="./folia.png" alt="logo" height="140" align="right">
 
 # 🔨 Auto-Build-Folia
 
