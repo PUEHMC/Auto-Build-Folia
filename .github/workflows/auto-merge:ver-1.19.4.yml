@@ -36,7 +36,7 @@ jobs:
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
 
       - name: Push changes
-        run: git -f push origin ver/1.19.4
+        run: git push -f origin ver/1.19.4
 
       - name: Cleanup
         run: |
