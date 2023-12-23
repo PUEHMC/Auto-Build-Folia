@@ -24,17 +24,19 @@ jobs:
       - name: Fetch upstream changes
         run: git fetch upstream
 
+      - name: Switch to branch
+        run: git checkout -b ver/1.19.4
+
       - name: Merge upstream changes
         run: |
-          git checkoutver/1.19.4
-          git merge upstream/ver/1.20.2 --allow-unrelated-histories -Xtheirs
+          git merge upstream/ver/1.19.4 --allow-unrelated-histories -Xtheirs
 
       - name: Configure Git with Secret
         run: |
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
 
       - name: Push changes
-        run: git push originver/1.19.4
+        run: git push origin ver/1.19.4
 
       - name: Cleanup
         run: |

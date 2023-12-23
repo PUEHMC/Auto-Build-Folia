@@ -24,9 +24,11 @@ jobs:
       - name: Fetch upstream changes
         run: git fetch upstream
 
+      - name: Switch to branch
+        run: git checkout -b dev/1.20.4
+
       - name: Merge upstream changes
         run: |
-          git checkout dev/1.20.4
           git merge upstream/dev/1.20.4 --allow-unrelated-histories -Xtheirs
 
       - name: Configure Git with Secret
