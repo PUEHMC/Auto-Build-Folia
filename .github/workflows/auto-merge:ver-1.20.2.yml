@@ -1,4 +1,4 @@
-name: Auto Merge Upstream `ver/1.20.2`
+name: Auto Merge Upstream ver/1.20.2
 
 on:
   schedule:
