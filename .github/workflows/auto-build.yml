@@ -43,7 +43,7 @@ jobs:
         with:
           files: "build/libs/*.jar"
           body: |
-            Version: `${{ steps.get_version.outputs.version }}` | Commit ${{ steps.short_sha.outputs.sha_short }}
+           📦Version: `${{ steps.get_version.outputs.version }}` | Commit ${{ steps.short_sha.outputs.sha_short }}
             This release is automatically compiled by GitHub Actions
           name: Folia ${{ steps.get_version.outputs.version }} Automation Compile ${{ steps.short_sha.outputs.sha_short }}
           draft: false
