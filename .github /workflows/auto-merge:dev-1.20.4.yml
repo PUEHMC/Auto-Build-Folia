@@ -1,0 +1,41 @@
+name: Auto Merge Upstream `dev/1.20.4`
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.RELEASE_KEY }}
+
+      - name: Set up Git
+        run: |
+          git config user.name "${{ secrets.NAME }}"
+          git config user.email "${{ secrets.EMAIL }}"
+          git remote add upstream https://github.com/PaperMC/Folia
+
+      - name: Fetch upstream changes
+        run: git fetch upstream
+
+      - name: Merge upstream changes
+        run: |
+          git checkout dev/1.20.4
+          git merge upstream/dev/1.20.4 --allow-unrelated-histories -Xtheirs
+
+      - name: Configure Git with Secret
+        run: |
+          git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
+
+      - name: Push changes
+        run: git push origin dev/1.20.4
+
+      - name: Cleanup
+        run: |
+          git remote remove upstream

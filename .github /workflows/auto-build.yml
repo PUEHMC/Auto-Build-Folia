@@ -1,0 +1,55 @@
+name: Patch and Build
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+
+jobs:
+  build:
+    # Only run on PRs if the source branch is on someone else's repo
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v3
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Configure Git User Details
+        run: git config --global user.email "actions@github.com" && git config --global user.name "Github Actions"
+      - name: Apply Patches
+        run: ./gradlew applyPatches
+      - name: Build
+        run: ./gradlew createReobfBundlerJar createReobfPaperclipJar
+      - uses: "actions/upload-artifact@v3"
+        with:
+          name: "Folia"
+          path: "build/libs/*.jar"
+      - name: Get version from asset
+        id: get_version
+        run: echo "::set-output name=version::$(echo ${{ github.event.head_commit.added }} | grep -oP 'folia-bundler-\K\d+\.\d+\.\d+')"
+      - name: Set outputs
+        id: short_sha
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "build/libs/*.jar"
+          body: |
+            Version: `${{ steps.get_version.outputs.version }}` | Commit ${{ steps.short_sha.outputs.sha_short }}
+            This release is automatically compiled by GitHub Actions
+          name: Folia ${{ steps.get_version.outputs.version }} Automation Compile ${{ steps.short_sha.outputs.sha_short }}
+          draft: false
+          tag_name: commit-${{ steps.get_version.outputs.version }}-${{ steps.short_sha.outputs.sha_short }}
+          generate_release_notes: true
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_KEY }}
+          GITHUB_REPOSITORY: Mira-LeafTown/Folia
