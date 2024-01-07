@@ -29,15 +29,13 @@ jobs:
 
       - name: Check for changes
         run: |
-          CHANGES=$(git rev-list HEAD..upstream/dev/1.20.4 --count)
+          CHANGES=$(git rev-list --left-right HEAD...upstream/dev/1.20.4 --count | awk '{print $1}')
           echo "Number of changes in upstream: $CHANGES"
           if [ $CHANGES -eq 0 ]; then
             echo "No changes in upstream. Exiting without further actions."
             exit 0
           else
             echo "Changes detected in upstream. Proceeding with merging."
-            git fetch upstream
-            git merge upstream/dev/1.20.4 --ff-only
           fi
 
       - name: Merge upstream changes
