@@ -2,7 +2,8 @@ name: Patch and Build
 
 on:
   push:
-    branches: [ "**" ]
+    branches-ignore:
+      - master
   pull_request:
 
 jobs:
