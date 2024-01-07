@@ -27,6 +27,16 @@ jobs:
       - name: Switch to branch
         run: git checkout -b ver/1.20.2
 
+      - name: Check for changes
+        run: |
+          CHANGES=$(git rev-list HEAD..upstream/master --count)
+          if [ $CHANGES -eq 0 ]; then
+            echo "No changes in upstream. Exiting without further actions."
+            exit 0
+          else
+            echo "Changes detected in upstream. Proceeding with merging."
+          fi
+
       - name: Merge upstream changes
         run: |
           git merge upstream/master --allow-unrelated-histories -Xtheirs
