@@ -35,7 +35,8 @@ jobs:
             echo "No changes in upstream. Exiting without further actions."
             exit 0
           else
-            echo "Changes detected in upstream. Proceeding with merging."
+            echo "Changes detected in upstream. Listing changed files:"
+            git diff --name-only HEAD upstream/dev/1.20.4
           fi
 
       - name: Merge upstream changes
