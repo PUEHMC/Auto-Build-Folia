@@ -29,7 +29,7 @@ jobs:
 
       - name: Check for changes
         run: |
-          CHANGES=$(git rev-list --left-right HEAD...upstream/dev/1.20.4 --count | awk '{print $1}')
+          CHANGES=$(git diff --name-only HEAD upstream/dev/1.20.4 | wc -l)
           echo "Number of changes in upstream: $CHANGES"
           if [ $CHANGES -eq 0 ]; then
             echo "No changes in upstream. Exiting without further actions."
