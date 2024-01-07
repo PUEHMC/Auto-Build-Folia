@@ -27,18 +27,6 @@ jobs:
       - name: Switch to branch
         run: git checkout -b dev/1.20.4
 
-      - name: Check for changes
-        run: |
-          CHANGES=$(git diff --name-only HEAD upstream/dev/1.20.4 | wc -l)
-          echo "Number of changes in upstream: $CHANGES"
-          if [ $CHANGES -eq 0 ]; then
-            echo "No changes in upstream. Exiting without further actions."
-            exit 0
-          else
-            echo "Changes detected in upstream. Listing changed files:"
-            git diff --name-only HEAD upstream/dev/1.20.4
-          fi
-
       - name: Merge upstream changes
         run: |
           git merge upstream/dev/1.20.4 --allow-unrelated-histories -Xtheirs
