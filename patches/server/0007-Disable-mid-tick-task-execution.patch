@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Spottedleaf <Spottedleaf@users.noreply.github.com>
+Date: Mon, 20 Mar 2023 02:07:43 -0700
+Subject: [PATCH] Disable mid-tick task execution
+
+Mid-tick task execution acquires the ticket lock at least,
+which can possibly be a significant performance bottleneck
+at a high tick thread + region count. This change should reduce
+the impact from scaling the region threads, but is not a fix
+to the underlying issue.
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 75d5e7f1b247e27f526a3f76fa7df7aeca4e90ac..5ded3dbc379f199ed735b6ce0ebf6a2e3485f93b 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -2877,6 +2877,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     }
+ 
+     public final void executeMidTickTasks() {
++        if (true) return; // Folia - disable mid-tick task execution
+         org.spigotmc.AsyncCatcher.catchOp("mid tick chunk task execution");
+         io.papermc.paper.threadedregions.RegionizedWorldData worldData = io.papermc.paper.threadedregions.TickRegionScheduler.getCurrentRegionizedWorldData(); // Folia - region threading
+         long startTime = System.nanoTime();
