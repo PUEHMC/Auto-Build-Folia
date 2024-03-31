@@ -71,35 +71,36 @@ jobs:
 
       - name: Fetch and check for updates
         run: |
-          # 更新远程跟踪分支信息
-          git fetch upstream
-          if git show-ref --verify --quiet "refs/heads/${{ env.LOCAL_BRANCH }}"; then
-          git checkout ${{ env.LOCAL_BRANCH }}
-          else
-          git checkout --orphan ${{ env.LOCAL_BRANCH }}
-           if [ "$(ls -A)" ]; then
-            git rm -rf .
-           fi
-          fi
-      
-          # 获取远程分支的最新提交哈希值
-          UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
-          echo "UPSTREAM_HASH=$UPSTREAM_HASH"
-          echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
-      
-          # 获取本地分支的最新提交哈希值
-          CURRENT_HASH=$(git rev-parse --verify ${{ env.LOCAL_BRANCH }})
-          echo "CURRENT_HASH=$CURRENT_HASH"
-          echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
-      
-          # 比较哈希值，确定是否有更新
-          if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
-            echo "updated=true" >> $GITHUB_ENV
-            echo "Upstream repository has been updated."
-          else
-            echo "No updates found in the upstream repository."
-          fi
-
+            # 更新远程跟踪分支信息
+            git fetch upstream
+            if git show-ref --verify --quiet "refs/heads/${{ env.LOCAL_BRANCH }}"; then
+              git checkout ${{ env.LOCAL_BRANCH }}
+              # 获取远程分支的最新提交哈希值
+              UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
+              echo "UPSTREAM_HASH=$UPSTREAM_HASH"
+              echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
+              
+              # 获取本地分支的最新提交哈希值
+              CURRENT_HASH=$(git rev-parse ${{ env.LOCAL_BRANCH }})
+              echo "CURRENT_HASH=$CURRENT_HASH"
+              echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
+              
+              # 比较哈希值，确定是否有更新
+              if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
+                echo "updated=true" >> $GITHUB_ENV
+                echo "Upstream repository has been updated."
+              else
+                echo "No updates found in the upstream repository."
+              fi
+            else
+              git checkout --orphan ${{ env.LOCAL_BRANCH }} && \
+              if [ "$(ls -A)" ]; then
+                git rm -rf .
+              fi
+              echo "updated=true" >> $GITHUB_ENV
+              echo "Upstream repository has been updated."
+            fi
+        
       # 如果上游有更新，则合并这些更新
       - name: Merge and push if updated
         if: env.updated == 'true'
