@@ -1,19 +1,64 @@
-name: Auto Merge Upstream ver/1.20.4
+# name: Auto Merge Upstream ver/1.20.4
+
+# on:
+#   schedule:
+#     - cron: "0 0 * * *"
+#   workflow_dispatch:
+
+# jobs:
+#   auto-merge:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+#         with:
+#           token: ${{ secrets.RELEASE_KEY }}
+
+#       - name: Set up Git
+#         run: |
+#           git config user.name "${{ secrets.NAME }}"
+#           git config user.email "${{ secrets.EMAIL }}"
+#           git remote add upstream https://github.com/PaperMC/Folia
+
+#       - name: Fetch upstream changes
+#         run: git fetch upstream
+
+#       - name: Switch to branch
+#         run: git checkout -b ver/1.20.4
+
+#       - name: Merge upstream changes
+#         run: |
+#           git merge upstream/master --allow-unrelated-histories -Xtheirs
+
+#       - name: Configure Git with Secret
+#         run: |
+#           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
+
+#       - name: Push changes
+#         run: git push -f origin ver/1.20.4
+
+#       - name: Cleanup
+#         run: |
+#           git remote remove upstream
+
+name: Auto Merge and Check Upstream Updates
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 * * * *" # 每小时执行一次检查上游是否有更新
   workflow_dispatch:
 
 jobs:
-  auto-merge:
+  auto-merge-and-check-updates:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout the current repo
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.RELEASE_KEY }}
+          path: 'current-repo'
 
       - name: Set up Git
         run: |
@@ -21,23 +66,31 @@ jobs:
           git config user.email "${{ secrets.EMAIL }}"
           git remote add upstream https://github.com/PaperMC/Folia
 
+      # 检查上游是否有更新
       - name: Fetch upstream changes
         run: git fetch upstream
 
-      - name: Switch to branch
-        run: git checkout -b ver/1.20.4
-
-      - name: Merge upstream changes
+      - name: Check for updates
+        id: check
         run: |
+          UPSTREAM_HASH=$(git rev-parse upstream/master)
+          echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
+          CURRENT_HASH=$(git rev-parse HEAD)
+          echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
+          if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
+            echo "::set-output name=updated::true"
+          fi
+
+      # 如果上游有更新，则合并这些更新
+      - name: Merge and push if updated
+        if: steps.check.outputs.updated == 'true'
+        run: |
+          git checkout -b ver/1.20.4  #本地分支
           git merge upstream/master --allow-unrelated-histories -Xtheirs
-
-      - name: Configure Git with Secret
-        run: |
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
+          git push -f origin ver/1.20.4  #远程分支
 
-      - name: Push changes
-        run: git push -f origin ver/1.20.4
-
+      # 清理操作，删除添加的远程仓库
       - name: Cleanup
         run: |
           git remote remove upstream
