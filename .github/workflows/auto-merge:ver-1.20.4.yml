@@ -73,7 +73,9 @@ jobs:
         run: |
           # 更新远程跟踪分支信息
           git fetch upstream
-          git checkout --orphan  -- ${{ env.LOCAL_BRANCH }}
+          echo ${{ env.LOCAL_BRANCH }}
+          git checkout --orphan ${{ env.LOCAL_BRANCH }}
+          git rm -rf .
       
           # 获取远程分支的最新提交哈希值
           UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
