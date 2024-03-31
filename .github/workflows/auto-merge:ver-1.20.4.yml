@@ -55,7 +55,7 @@ jobs:
     env:
       UPSTREAM: 'https://github.com/PaperMC/Folia' # 上游仓库地址
       UPSTREAM_BRANCH: 'master' # 上游分支变量
-      LOCAL_BRANCH: 'ver-1.20.4' # 本地分支变量
+      LOCAL_BRANCH: 'ver/1.20.4' # 本地分支变量
 
     steps:
       - name: Checkout the current repo
@@ -75,7 +75,7 @@ jobs:
           git fetch upstream
           echo ${{ env.LOCAL_BRANCH }}
           git checkout --orphan ${{ env.LOCAL_BRANCH }}
-          git switch ${{ env.LOCAL_BRANCH }}
+          git checkout ${{ env.LOCAL_BRANCH }}
           git rm -rf .
       
           # 获取远程分支的最新提交哈希值
