@@ -70,20 +70,20 @@ jobs:
         run: git fetch upstream
 
       - name: Check for updates
-        id: check
         run: |
           UPSTREAM_HASH=$(git rev-parse upstream/master)
           echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
           CURRENT_HASH=$(git rev-parse HEAD)
           echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
           if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
-            echo "::set-output name=updated::true"
+            echo "updated=true" >> $GITHUB_ENV
           fi
 
       # 如果上游有更新，则合并这些更新
       - name: Merge and push if updated
-        if: steps.check.outputs.updated == 'true'
+        if: env.updated == 'true'
         run: |
+          echo "Upstream has updates. Implement your update logic here."
           git checkout -b ver/1.20.4  #本地分支
           git merge upstream/master --allow-unrelated-histories -Xtheirs
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
