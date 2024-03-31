@@ -69,26 +69,28 @@ jobs:
           git config user.email "${{ secrets.EMAIL }}"
           git remote add upstream ${{ env.UPSTREAM }}
 
-      - name: Fetch upstream changes
-        run: git fetch upstream && git checkout -b ${{ env.LOCAL_BRANCH }}
-
-      - name: Check for updates
+      - name: Fetch and check for updates
         run: |
+          # 更新远程跟踪分支信息
+          git fetch upstream
+          git checkout -b ${{ env.LOCAL_BRANCH }}
+      
+          # 获取远程分支的最新提交哈希值
           UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
           echo "UPSTREAM_HASH=$UPSTREAM_HASH"
           echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
       
-          # 确保本地分支存在
-          git fetch origin ${{ env.LOCAL_BRANCH }}:${{ env.LOCAL_BRANCH }}
+          # 获取本地分支的最新提交哈希值
           CURRENT_HASH=$(git rev-parse ${{ env.LOCAL_BRANCH }})
           echo "CURRENT_HASH=$CURRENT_HASH"
           echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
       
+          # 比较哈希值，确定是否有更新
           if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
-           echo "updated=true" >> $GITHUB_ENV
-           echo "Upstream repository has been updated."
+            echo "updated=true" >> $GITHUB_ENV
+            echo "Upstream repository has been updated."
           else
-          echo "No updates found in the upstream repository."
+            echo "No updates found in the upstream repository."
 
       # 如果上游有更新，则合并这些更新
       - name: Merge and push if updated
