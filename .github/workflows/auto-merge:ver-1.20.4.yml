@@ -75,6 +75,7 @@ jobs:
           git fetch upstream
           echo ${{ env.LOCAL_BRANCH }}
           git checkout --orphan ${{ env.LOCAL_BRANCH }}
+          git switch ${{ env.LOCAL_BRANCH }}
           git rm -rf .
       
           # 获取远程分支的最新提交哈希值
@@ -83,7 +84,7 @@ jobs:
           echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
       
           # 获取本地分支的最新提交哈希值
-          CURRENT_HASH=$(git rev-parse ${{ env.LOCAL_BRANCH }})
+          CURRENT_HASH=$(git rev-parse --verify ${{ env.LOCAL_BRANCH }})
           echo "CURRENT_HASH=$CURRENT_HASH"
           echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
       
