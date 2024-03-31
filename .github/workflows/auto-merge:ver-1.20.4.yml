@@ -69,47 +69,18 @@ jobs:
           git config user.email "${{ secrets.EMAIL }}"
           git remote add upstream ${{ env.UPSTREAM }}
 
-      - name: Fetch and check for updates
+      - name: Fetch
         run: |
-            git fetch upstream
-            if git show-ref --verify --quiet "refs/heads/${{ env.LOCAL_BRANCH }}"; then
-              git checkout ${{ env.LOCAL_BRANCH }}
-              echo "已存在分支 切换到本地分支 检测哈希"
+          git fetch upstream
+          git checkout --orphan ${{ env.LOCAL_BRANCH }} && \
+          git rm -rf .
 
-              UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
-              echo "[远程分支哈希] UPSTREAM_HASH=$UPSTREAM_HASH"
-              echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
-              
-              CURRENT_HASH=$(git rev-parse ${{ env.LOCAL_BRANCH }})
-              echo "[本地分支哈希] CURRENT_HASH=$CURRENT_HASH"
-              echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
-              
-              if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
-                echo "updated=true" >> $GITHUB_ENV
-                echo "[哈希检测] 检测到远程存储库已更新 执行更新分支"
-              else
-                echo "No updates found in the upstream repository."
-              fi
-            else
-              echo "不存在分支 创建本地分支 不检测哈希"
-              git checkout --orphan ${{ env.LOCAL_BRANCH }} && \
-              if [ "$(ls -A)" ]; then
-                echo "目录不为空 删除所有文件"
-                git rm -rf .
-              fi
-              echo "updated=true" >> $GITHUB_ENV
-              echo "[哈希检测] 检测到远程存储库已更新 执行更新分支"
-            fi
-        
-      # 如果上游有更新，则合并这些更新
       - name: Merge and push if updated
-        if: env.updated == 'true'
         run: |
           git merge upstream/${{ env.UPSTREAM_BRANCH }}
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
           git push origin ${{ env.LOCAL_BRANCH }}
 
-      # 清理操作，删除添加的远程仓库
       - name: Cleanup
         run: |
           git remote remove upstream
