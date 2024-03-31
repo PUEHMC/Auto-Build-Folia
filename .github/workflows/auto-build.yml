@@ -6,7 +6,6 @@ on:
    #   - 'ver/**'
     branches-ignore:
       - 'master'
-      - '!ver/**'
   #pull_request:
   workflow_dispatch:
 
