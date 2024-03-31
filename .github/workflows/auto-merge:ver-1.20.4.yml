@@ -73,7 +73,7 @@ jobs:
         run: |
           # 更新远程跟踪分支信息
           git fetch upstream
-          git checkout -b ${{ env.LOCAL_BRANCH }}
+          git checkout ${{ env.LOCAL_BRANCH }} || git switch -c ${{ env.LOCAL_BRANCH }}
       
           # 获取远程分支的最新提交哈希值
           UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
@@ -97,9 +97,9 @@ jobs:
       - name: Merge and push if updated
         if: env.updated == 'true'
         run: |
-          git merge upstream/${{ env.UPSTREAM_BRANCH }} --allow-unrelated-histories -Xtheirs
+          git merge upstream/${{ env.UPSTREAM_BRANCH }}
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
-          git push -f origin ${{ env.LOCAL_BRANCH }}
+          git push  origin ${{ env.LOCAL_BRANCH }}
 
       # 清理操作，删除添加的远程仓库
       - name: Cleanup
