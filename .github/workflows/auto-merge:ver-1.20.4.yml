@@ -42,7 +42,7 @@
 #         run: |
 #           git remote remove upstream
 
-name: Auto Merge and Check Upstream Updates
+name: '[V2]Auto Merge Upstream ver/1.20.4'
 
 on:
   schedule:
