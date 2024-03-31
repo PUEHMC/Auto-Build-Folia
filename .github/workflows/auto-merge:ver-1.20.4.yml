@@ -72,6 +72,8 @@ jobs:
       - name: Fetch and check for updates
         run: |
             git fetch upstream
+            echo "${{ env.LOCAL_BRANCH }}"
+            git branch --list
             if git branch --list | grep -q "${{ env.LOCAL_BRANCH }}"; then
               git checkout ${{ env.LOCAL_BRANCH }}
               echo "已存在分支 切换到本地分支 检测哈希"
