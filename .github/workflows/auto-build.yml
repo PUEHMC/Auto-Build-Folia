@@ -2,10 +2,11 @@ name: Patch and Build
 
 on:
   push:
-    branches:
-      - 'ver/**'
+   #branches:
+   #   - 'ver/**'
     branches-ignore:
-      - master
+      - 'master'
+      - '!ver/**'
   #pull_request:
   workflow_dispatch:
 
