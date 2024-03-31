@@ -1,4 +1,4 @@
-name: Auto Merge Upstream dev/1.20.4
+name: Auto Merge Upstream ver/1.20.4
 
 on:
   schedule:
@@ -25,18 +25,18 @@ jobs:
         run: git fetch upstream
 
       - name: Switch to branch
-        run: git checkout -b dev/1.20.4
+        run: git checkout -b ver/1.20.4
 
       - name: Merge upstream changes
         run: |
-          git merge upstream/dev/1.20.4 --allow-unrelated-histories -Xtheirs
+          git merge upstream/master --allow-unrelated-histories -Xtheirs
 
       - name: Configure Git with Secret
         run: |
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
 
       - name: Push changes
-        run: git push -f origin dev/1.20.4
+        run: git push -f origin ver/1.20.4
 
       - name: Cleanup
         run: |
