@@ -91,6 +91,7 @@ jobs:
             echo "Upstream repository has been updated."
           else
             echo "No updates found in the upstream repository."
+          fi
 
       # 如果上游有更新，则合并这些更新
       - name: Merge and push if updated
