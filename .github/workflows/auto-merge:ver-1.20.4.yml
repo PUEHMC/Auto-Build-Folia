@@ -70,30 +70,30 @@ jobs:
           git remote add upstream ${{ env.UPSTREAM }}
 
       - name: Fetch upstream changes
-        run: git fetch upstream
+        run: git fetch upstream && git checkout -b ${{ env.LOCAL_BRANCH }}
 
       - name: Check for updates
         run: |
-         UPSTREAM_HASH=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
-         echo "UPSTREAM_HASH=$UPSTREAM_HASH"
-         echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
-        
-         CURRENT_HASH=$(git rev-parse ${{ env.LOCAL_BRANCH }})
-         echo "CURRENT_HASH=$CURRENT_HASH"
-         echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
-        
-         if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
-          echo "updated=true" >> $GITHUB_ENV
-          echo "Upstream repository has been updated."
-         else
+          UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
+          echo "UPSTREAM_HASH=$UPSTREAM_HASH"
+          echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
+      
+          # 确保本地分支存在
+          git fetch origin ${{ env.LOCAL_BRANCH }}:${{ env.LOCAL_BRANCH }}
+          CURRENT_HASH=$(git rev-parse ${{ env.LOCAL_BRANCH }})
+          echo "CURRENT_HASH=$CURRENT_HASH"
+          echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
+      
+          if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
+           echo "updated=true" >> $GITHUB_ENV
+           echo "Upstream repository has been updated."
+          else
           echo "No updates found in the upstream repository."
-         fi
 
       # 如果上游有更新，则合并这些更新
       - name: Merge and push if updated
         if: env.updated == 'true'
         run: |
-          git checkout -b ${{ env.LOCAL_BRANCH }}
           git merge upstream/${{ env.UPSTREAM_BRANCH }} --allow-unrelated-histories -Xtheirs
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
           git push -f origin ${{ env.LOCAL_BRANCH }}
