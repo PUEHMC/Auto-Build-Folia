@@ -71,13 +71,20 @@ jobs:
 
       - name: Check for updates
         run: |
-          UPSTREAM_HASH=$(git rev-parse upstream/master)
-          echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
-          CURRENT_HASH=$(git rev-parse HEAD)
-          echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
-          if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
-            echo "updated=true" >> $GITHUB_ENV
-          fi
+         UPSTREAM_HASH=$(git rev-parse upstream/master)
+         echo "UPSTREAM_HASH=$UPSTREAM_HASH"
+         echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
+        
+         CURRENT_HASH=$(git rev-parse HEAD)
+         echo "CURRENT_HASH=$CURRENT_HASH"
+         echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
+        
+         if [ "$UPSTREAM_HASH" != "$CURRENT_HASH" ]; then
+          echo "updated=true" >> $GITHUB_ENV
+          echo "Upstream repository has been updated."
+         else
+          echo "No updates found in the upstream repository."
+         fi
 
       # 如果上游有更新，则合并这些更新
       - name: Merge and push if updated
