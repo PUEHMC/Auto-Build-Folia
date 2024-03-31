@@ -73,10 +73,14 @@ jobs:
         run: |
           # 更新远程跟踪分支信息
           git fetch upstream
-          echo ${{ env.LOCAL_BRANCH }}
-          git checkout --orphan ${{ env.LOCAL_BRANCH }}
+          if git show-ref --verify --quiet "refs/heads/${{ env.LOCAL_BRANCH }}"; then
           git checkout ${{ env.LOCAL_BRANCH }}
-          git rm -rf .
+          else
+          git checkout --orphan ${{ env.LOCAL_BRANCH }}
+           if [ "$(ls -A)" ]; then
+            git rm -rf .
+           fi
+          fi
       
           # 获取远程分支的最新提交哈希值
           UPSTREAM_HASH=$(git rev-parse refs/remotes/upstream/${{ env.UPSTREAM_BRANCH }})
