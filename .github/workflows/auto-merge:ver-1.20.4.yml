@@ -67,7 +67,7 @@ jobs:
         run: |
           git config user.name "${{ secrets.NAME }}"
           git config user.email "${{ secrets.EMAIL }}"
-          git remote add upstream ${{ env.UPSTREAM }}"
+          git remote add upstream ${{ env.UPSTREAM }}
 
       - name: Fetch upstream changes
         run: git fetch upstream
