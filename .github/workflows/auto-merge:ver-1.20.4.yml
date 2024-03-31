@@ -55,7 +55,7 @@ jobs:
     env:
       UPSTREAM: 'https://github.com/PaperMC/Folia' # 上游仓库地址
       UPSTREAM_BRANCH: 'master' # 上游分支变量
-      LOCAL_BRANCH: 'ver/1.20.4' # 本地分支变量
+      LOCAL_BRANCH: 'ver-1.20.4' # 本地分支变量
 
     steps:
       - name: Checkout the current repo
