@@ -74,7 +74,7 @@ jobs:
             git fetch upstream
             echo "${{ env.LOCAL_BRANCH }}"
             git branch --all
-            if git branch --all | grep -q "${{ env.LOCAL_BRANCH }}"; then
+            if git branch --all | grep -q "remotes/upstream/${{ env.LOCAL_BRANCH }}"; then
               git checkout ${{ env.LOCAL_BRANCH }}
               echo "已存在分支 切换到本地分支 检测哈希"
 
