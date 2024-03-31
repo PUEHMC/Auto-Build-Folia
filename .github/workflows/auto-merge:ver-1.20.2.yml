@@ -29,7 +29,7 @@ jobs:
 
       - name: Merge upstream changes
         run: |
-          git merge upstream/master --allow-unrelated-histories -Xtheirs
+          git merge upstream/ver/1.20.2 --allow-unrelated-histories -Xtheirs
 
       - name: Configure Git with Secret
         run: |
