@@ -46,12 +46,16 @@ name: '[V2]Auto Merge Upstream ver/1.20.4'
 
 on:
   schedule:
-    - cron: "0 * * * *" # 每小时执行一次检查上游是否有更新
+    - cron: "0 * * * *" # 每小时执行一次 检查上游是否有更新
   workflow_dispatch:
 
 jobs:
   auto-merge-and-check-updates:
     runs-on: ubuntu-latest
+    env:
+      UPSTREAM: 'https://github.com/PaperMC/Folia' # 上游仓库地址
+      UPSTREAM_BRANCH: 'master' # 上游分支变量
+      LOCAL_BRANCH: 'ver/1.20.4' # 本地分支变量
 
     steps:
       - name: Checkout the current repo
@@ -63,19 +67,18 @@ jobs:
         run: |
           git config user.name "${{ secrets.NAME }}"
           git config user.email "${{ secrets.EMAIL }}"
-          git remote add upstream https://github.com/PaperMC/Folia
+          git remote add upstream ${{ env.UPSTREAM }}"
 
-      # 检查上游是否有更新
       - name: Fetch upstream changes
         run: git fetch upstream
 
       - name: Check for updates
         run: |
-         UPSTREAM_HASH=$(git rev-parse upstream/master)
+         UPSTREAM_HASH=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
          echo "UPSTREAM_HASH=$UPSTREAM_HASH"
          echo "UPSTREAM_HASH=$UPSTREAM_HASH" >> $GITHUB_ENV
         
-         CURRENT_HASH=$(git rev-parse HEAD)
+         CURRENT_HASH=$(git rev-parse ${{ env.LOCAL_BRANCH }})
          echo "CURRENT_HASH=$CURRENT_HASH"
          echo "CURRENT_HASH=$CURRENT_HASH" >> $GITHUB_ENV
         
@@ -90,11 +93,10 @@ jobs:
       - name: Merge and push if updated
         if: env.updated == 'true'
         run: |
-          echo "Upstream has updates. Implement your update logic here."
-          git checkout -b ver/1.20.4  #本地分支
-          git merge upstream/master --allow-unrelated-histories -Xtheirs
+          git checkout -b ${{ env.LOCAL_BRANCH }}
+          git merge upstream/${{ env.UPSTREAM_BRANCH }} --allow-unrelated-histories -Xtheirs
           git config --global user.signingkey ${{ secrets.RELEASE_KEY }}
-          git push -f origin ver/1.20.4  #远程分支
+          git push -f origin ${{ env.LOCAL_BRANCH }}
 
       # 清理操作，删除添加的远程仓库
       - name: Cleanup
